@@ -47,7 +47,7 @@ class TestServer (TestCase) :
     def test_query_1 (self) :
         request = "QUERY\r\n200.35.55.13\r\nEND\r\n"
         response = getResponse(request)
-        self.assertEqual("RESULT\r\n200.35.55.13\r\nEND\r\n", response)
+        self.assertEqual("RESULT\r\n200.34.55.66 A 22\r\nEND\r\n", response)
 
 # ----
 # main

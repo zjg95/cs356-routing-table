@@ -23,6 +23,20 @@ MAX_FILE_SIZE = 8192
 endl = "\r\n"
 END = "END"
 
+# -----
+# query
+# -----
+
+def query (body) :
+	return "200.34.55.66 A 22"
+
+# ------
+# update
+# ------
+
+def update (body) :
+	pass
+
 # --------
 # get port
 # --------
@@ -94,7 +108,7 @@ def getResponse (details) :
 		response += "ACK" + endl
 	else :
 		response += "RESULT" + endl
-		response += details["body"][0] + endl
+		response += query(details["body"][0]) + endl
 	response += END + endl
 	return response.encode()
 
