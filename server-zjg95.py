@@ -21,6 +21,7 @@ serverName = "Server"
 serverVersion = "0.1"
 MAX_FILE_SIZE = 8192
 endl = "\r\n"
+END = "END"
 
 # --------
 # get port
@@ -89,6 +90,12 @@ def getResponse (details) :
     return a string
     """
 	response = ""
+	if details["command"] == "UPDATE" :
+		response += "ACK" + endl
+	else :
+		response += "RESULT" + endl
+		response += details["body"][0] + endl
+	response += END + endl
 	return response.encode()
 
 # ---------------
