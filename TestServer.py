@@ -26,14 +26,8 @@ def getResponse (request) :
 
     clientSocket.send(request.encode())
     modifiedSentence = clientSocket.recv(2048)
-    try :
-
-        response = modifiedSentence.decode()
-
-    except UnicodeDecodeError :
-        response = ""
-        for byte in modifiedSentence :
-            response += chr(byte)
+    
+    response = modifiedSentence.decode()
 
     clientSocket.close()
 
@@ -47,7 +41,7 @@ class TestServer (TestCase) :
 
     def test_connect_1 (self) :
         response = getResponse("test")
-        self.assertEqual(1, 1)
+        self.assertEqual("", response)
 
 # ----
 # main

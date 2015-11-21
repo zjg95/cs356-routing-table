@@ -20,6 +20,7 @@ from sys import argv, exit
 serverName = "Server"
 serverVersion = "0.1"
 MAX_FILE_SIZE = 8192
+endl = "\r\n"
 
 # --------
 # get port
@@ -49,6 +50,31 @@ def getRequest (socket) :
 	request = bytes.decode(request)
 	return request
 
+# -------------
+# parse request
+# -------------
+
+def parseRequest (request) :
+	"""
+    parse the pieces of the request, store in a dictionary
+    request a string containing the client's request
+    return a dictionary
+    """
+	return {}
+
+# ------------
+# get response
+# ------------
+
+def getResponse (details) :
+	"""
+    create a string response containing the appropriate HTTP headers
+    details a dictionary containing the header data
+    return a string
+    """
+	response = ""
+	return response.encode()
+
 # ---------------
 # return response
 # ---------------
@@ -77,9 +103,11 @@ def listen() :
 		# obtain the request through the wire
 		rawRequest = getRequest(clientSocket)
 
-		# add the headers to the response
-		# rawResponse = getResponse(responseDict)
-		rawResponse = "test".encode()
+		# parse the request into a dictionary
+		parsedRequest = parseRequest(rawRequest)
+
+		# get an encoded string for our response
+		rawResponse = getResponse(parsedRequest)
 
 		# send the response over the wire
 		returnResponse(rawResponse, clientSocket)
