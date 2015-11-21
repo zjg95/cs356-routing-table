@@ -40,7 +40,8 @@ def getResponse (request) :
 class TestServer (TestCase) :
 
     def test_connect_1 (self) :
-        response = getResponse("test")
+        request = "UPDATE\r\nA 200.34.55.0/24 22\r\nEND\r\n"
+        response = getResponse(request)
         self.assertEqual("", response)
 
 # ----

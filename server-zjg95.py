@@ -60,7 +60,23 @@ def parseRequest (request) :
     request a string containing the client's request
     return a dictionary
     """
-	return {}
+	response = {}
+    
+	print("<" + request + ">")
+	lines = request.splitlines()
+	print(lines)
+	size = len(lines)
+
+	assert size >= 3
+	assert lines[size - 1] == "END"
+
+	response["command"] = lines[0]
+	response["body"] = [lines[i] for i in range(1, size - 1)]
+	assert len(response["body"]) == size - 2
+
+	print (response)
+
+	return response
 
 # ------------
 # get response
