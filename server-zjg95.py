@@ -78,7 +78,8 @@ def listen() :
 		rawRequest = getRequest(clientSocket)
 
 		# add the headers to the response
-		rawResponse = getResponse(responseDict)
+		# rawResponse = getResponse(responseDict)
+		rawResponse = "test".encode()
 
 		# send the response over the wire
 		returnResponse(rawResponse, clientSocket)

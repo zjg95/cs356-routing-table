@@ -37,7 +37,7 @@ def getResponse (request) :
 
     clientSocket.close()
 
-    return parseResponse(response)
+    return response
 
 # ------------
 # TestTastyTTP
@@ -45,8 +45,8 @@ def getResponse (request) :
 
 class TestServer (TestCase) :
 
-    def test_1 (self) :
-
+    def test_connect_1 (self) :
+        response = getResponse("test")
         self.assertEqual(1, 1)
 
 # ----
