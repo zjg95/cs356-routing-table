@@ -19,6 +19,7 @@ from sys import argv, exit
 
 serverName = "Server"
 serverVersion = "0.1"
+MAX_FILE_SIZE = 8192
 
 # --------
 # get port
