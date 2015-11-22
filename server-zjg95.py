@@ -23,7 +23,7 @@ serverVersion = "0.1"
 MAX_FILE_SIZE = 8192
 endl = "\r\n"
 
-DEFAULT_MASK = "0.0.0.0/0"
+DEFAULT_MASK = IPv4Network("0.0.0.0/0")
 DEFAULT_HOST = 'A'
 DEFAULT_COST = 100
 
@@ -52,7 +52,7 @@ class Host :
 	def query(self, address) :
 		for mask in self.addresses :
 			if address in mask :
-				return self.addresses[mask]
+				return mask, self.addresses[mask]
 		raise AddressNotFoundException
 
 	def update(self, mask, cost) :
@@ -72,17 +72,22 @@ def query (address) :
 	name = DEFAULT_HOST
 	cost = DEFAULT_COST
 
-	for host in hostList :
+	for hostName in hostList :
 		try :
-			currentMask, currentCost = host.query(ip)
+			currentMask, currentCost = hostList[hostName].query(ip)
+
+			print("Host " + hostName + " contains the address " + str(ip))
 
 			if currentCost < cost :
-				name = host.name()
+				print("The cost (" + str(currentCost) + ") is cheaper than the known cost (" + str(currentCost) + ")")
+				name = hostName
 				mask = currentMask
 				cost = currentCost
+			else :
+				print("It is not cheaper")
 
-		except :
-			pass
+		except AddressNotFoundException :
+			print("Host " + hostName + " does not contain the address " + str(ip))
 
 	print(address + " " + name + " " + str(cost))
 	return address + " " + name + " " + str(cost)
@@ -93,6 +98,7 @@ def query (address) :
 
 def update (line) :
 	host, mask, cost = line.split(' ')
+	mask = IPv4Network(mask)
 	hostList[host].update(mask, cost)
 	print(line)
 
