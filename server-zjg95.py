@@ -14,29 +14,6 @@ from socket	import *
 from ipaddress import *
 from sys import argv, exit
 
-class AddressNotFoundException (Exception) :
-	pass
-
-class Host :
-
-	def __init__(self, name) :
-		self.name = name
-		self.addresses = []
-
-	def __str__(self) :
-		return self.name
-
-	def query(self, address) :
-		if END == "END" :
-			return address, 22
-		raise AddressNotFoundException
-
-	def update(self, address, cost) :
-		pass
-
-	def name(self) :
-		return self.name
-
 # ----------------
 # server meta data
 # ----------------
@@ -45,12 +22,44 @@ serverName = "Server"
 serverVersion = "0.1"
 MAX_FILE_SIZE = 8192
 endl = "\r\n"
-END = "END"
-DEFAULT_MASK = "0.0.0.0"
-DEFAULT_HOST = "A"
+
+DEFAULT_MASK = "0.0.0.0/0"
+DEFAULT_HOST = 'A'
 DEFAULT_COST = 100
-hosts = [Host(DEFAULT_HOST)]
-hosts[0].update(DEFAULT_MASK, DEFAULT_COST)
+
+hostList = {}
+
+# -----------------
+# address not found
+# -----------------
+
+class AddressNotFoundException (Exception) :
+	pass
+
+# ----
+# host
+# ----
+
+class Host :
+
+	# [mask : cost]
+	# [0.0.0.0/0: 100]
+
+	def __init__(self, name) :
+		self.name = name
+		self.addresses = {}
+
+	def query(self, address) :
+		for mask in self.addresses :
+			if address in mask :
+				return self.addresses[mask]
+		raise AddressNotFoundException
+
+	def update(self, mask, cost) :
+		self.addresses[mask] = cost
+
+	def name(self) :
+		return str(self.name)
 
 # -----
 # query
@@ -58,26 +67,34 @@ hosts[0].update(DEFAULT_MASK, DEFAULT_COST)
 
 def query (address) :
 	ip = IPv4Address(address)
+
 	mask = DEFAULT_MASK
 	name = DEFAULT_HOST
 	cost = DEFAULT_COST
-	for host in hosts :
+
+	for host in hostList :
 		try :
 			currentMask, currentCost = host.query(ip)
 
-			# name = host.name()
-			# cost = currentCost
+			if currentCost < cost :
+				name = host.name()
+				mask = currentMask
+				cost = currentCost
 
 		except :
 			pass
+
+	print(address + " " + name + " " + str(cost))
 	return address + " " + name + " " + str(cost)
 
 # ------
 # update
 # ------
 
-def update (body) :
-	pass
+def update (line) :
+	host, mask, cost = line.split(' ')
+	hostList[host].update(mask, cost)
+	print(line)
 
 # --------
 # get port
@@ -117,23 +134,22 @@ def parseRequest (request) :
     request a string containing the client's request
     return a dictionary
     """
-	response = {}
+	details = {}
     
-	print("<" + request + ">")
 	lines = request.splitlines()
-	print(lines)
 	size = len(lines)
 
 	assert size >= 3
 	assert lines[size - 1] == "END"
 
-	response["command"] = lines[0]
-	response["body"] = [lines[i] for i in range(1, size - 1)]
-	assert len(response["body"]) == size - 2
+	details["command"] = lines[0]
+	details["body"] = [lines[i] for i in range(1, size - 1)]
+	assert len(details["body"]) == size - 2
+	assert len(details["body"]) > 0
 
-	print (response)
+	print (details)
 
-	return response
+	return details
 
 # ------------
 # get response
@@ -148,11 +164,14 @@ def getResponse (details) :
 	response = ""
 	if details["command"] == "UPDATE" :
 		response += "ACK" + endl
+		assert len(details["body"]) > 0
+		for line in details["body"] :
+			update(line)
 	else :
 		response += "RESULT" + endl
 		assert len(details["body"]) == 1
 		response += query(details["body"][0]) + endl
-	response += END + endl
+	response += "END" + endl
 	return response.encode()
 
 # ---------------
@@ -206,6 +225,11 @@ print("------------")
 # define port number and socket
 port = getPort()
 serverSocket = socket(AF_INET, SOCK_STREAM)
+
+# initialize host list
+for i in range(ord('A'), ord('I')) :
+	hostList[chr(i)] = Host(chr(i))
+# hostList[DEFAULT_HOST].update(DEFAULT_MASK, DEFAULT_COST)
 
 # activate socket
 serverSocket.bind(('localhost', port))
