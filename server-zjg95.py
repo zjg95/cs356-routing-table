@@ -84,7 +84,7 @@ def query (address) :
 				mask = currentMask
 				cost = currentCost
 			else :
-				print("It is not cheaper")
+				print("But it is not cheaper")
 
 		except AddressNotFoundException :
 			print("Host " + hostName + " does not contain the address " + str(ip))
@@ -99,6 +99,7 @@ def query (address) :
 def update (line) :
 	host, mask, cost = line.split(' ')
 	mask = IPv4Network(mask)
+	cost = int(cost)
 	hostList[host].update(mask, cost)
 	print(line)
 
