@@ -11,6 +11,7 @@
 # -------
 
 from socket	import *
+from ipaddress import *
 from sys import argv, exit
 
 # ----------------
@@ -27,8 +28,9 @@ END = "END"
 # query
 # -----
 
-def query (body) :
-	return "200.34.55.66 A 22"
+def query (address) :
+	# ip = IPv4Address(address)
+	return address + " A 22"
 
 # ------
 # update
@@ -108,6 +110,7 @@ def getResponse (details) :
 		response += "ACK" + endl
 	else :
 		response += "RESULT" + endl
+		assert len(details["body"]) == 1
 		response += query(details["body"][0]) + endl
 	response += END + endl
 	return response.encode()
