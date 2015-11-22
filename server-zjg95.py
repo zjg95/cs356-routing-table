@@ -14,6 +14,29 @@ from socket	import *
 from ipaddress import *
 from sys import argv, exit
 
+class AddressNotFoundException (Exception) :
+	pass
+
+class Host :
+
+	def __init__(self, name) :
+		self.name = name
+		self.addresses = []
+
+	def __str__(self) :
+		return self.name
+
+	def query(self, address) :
+		if END == "END" :
+			return address, 22
+		raise AddressNotFoundException
+
+	def update(self, address, cost) :
+		pass
+
+	def name(self) :
+		return self.name
+
 # ----------------
 # server meta data
 # ----------------
@@ -23,14 +46,31 @@ serverVersion = "0.1"
 MAX_FILE_SIZE = 8192
 endl = "\r\n"
 END = "END"
+DEFAULT_MASK = "0.0.0.0"
+DEFAULT_HOST = "A"
+DEFAULT_COST = 100
+hosts = [Host(DEFAULT_HOST)]
+hosts[0].update(DEFAULT_MASK, DEFAULT_COST)
 
 # -----
 # query
 # -----
 
 def query (address) :
-	# ip = IPv4Address(address)
-	return address + " A 22"
+	ip = IPv4Address(address)
+	mask = DEFAULT_MASK
+	name = DEFAULT_HOST
+	cost = DEFAULT_COST
+	for host in hosts :
+		try :
+			currentMask, currentCost = host.query(ip)
+
+			# name = host.name()
+			# cost = currentCost
+
+		except :
+			pass
+	return address + " " + name + " " + str(cost)
 
 # ------
 # update
