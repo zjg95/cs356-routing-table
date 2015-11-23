@@ -10,8 +10,8 @@
 # imports
 # -------
 
-from socket	import *
-from ipaddress import *
+from socket	import socket, AF_INET, SOCK_STREAM
+from ipaddress import IPv4Network, IPv4Address
 from sys import argv, exit
 
 # ----------------
@@ -34,6 +34,9 @@ hostList = {}
 # -----------------
 
 class AddressNotFoundException (Exception) :
+	"""
+	indicates that the host does not have access to the given address
+	"""
 	pass
 
 # ----
@@ -42,14 +45,25 @@ class AddressNotFoundException (Exception) :
 
 class Host :
 
-	# [mask : cost]
-	# [0.0.0.0/0: 100]
+	"""
+	another router that has access to various hosts in a network
+	"""
 
 	def __init__(self, name) :
+		"""
+		initialize the host
+		name a string
+		"""
 		self.name = name
 		self.addresses = {}
 
 	def query(self, address) :
+		"""
+		ask the host for the cost to get to a given address
+		address the IPv4Address to find
+		return an IPv4Network and an int
+		raise AddressNotFoundException if the host cannot find the address
+		"""
 		bestNetwork = DEFAULT_MASK
 		bestCost = DEFAULT_COST
 		for network in self.addresses :
@@ -64,9 +78,18 @@ class Host :
 		raise AddressNotFoundException
 
 	def update(self, mask, cost) :
+		"""
+		adds an address and cost to the routing table, updates cost if entry exists
+		mask the IPv4Network the host accesses
+		cost the integer cost to access the network
+		"""
 		self.addresses[mask] = cost
 
 	def name(self) :
+		"""
+		get the name of the host
+		return a string
+		"""
 		return str(self.name)
 
 # -----
@@ -74,6 +97,11 @@ class Host :
 # -----
 
 def query (address) :
+	"""
+	find out the cost to get to a given address
+	address the IPv4Address to find
+	return a string
+	"""
 	ip = IPv4Address(address)
 
 	mask = DEFAULT_MASK
@@ -99,6 +127,10 @@ def query (address) :
 # ------
 
 def update (line) :
+	"""
+	update the cost to get to a network in the routing table
+	line the given input string
+	"""
 	host, mask, cost = line.split(' ')
 	mask = IPv4Network(mask)
 	cost = int(cost)
