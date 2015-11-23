@@ -50,9 +50,17 @@ class Host :
 		self.addresses = {}
 
 	def query(self, address) :
-		for mask in self.addresses :
-			if address in mask :
-				return mask, self.addresses[mask]
+		bestNetwork = DEFAULT_MASK
+		bestCost = DEFAULT_COST
+		for network in self.addresses :
+			if address in network :
+				# is this network better than the best?
+				cost = self.addresses[network]
+				if cost < bestCost :
+					bestNetwork = network
+					bestCost = cost
+		if bestNetwork != DEFAULT_MASK :
+			return bestNetwork, self.addresses[bestNetwork]
 		raise AddressNotFoundException
 
 	def update(self, mask, cost) :
@@ -76,20 +84,22 @@ def query (address) :
 		try :
 			currentMask, currentCost = hostList[hostName].query(ip)
 
-			print("Host " + hostName + " contains the address " + str(ip))
+			# print("Host " + hostName + " contains the address " + str(ip))
 
 			if currentCost < cost :
-				print("The cost (" + str(currentCost) + ") is cheaper than the known cost (" + str(currentCost) + ")")
+				# print("The cost (" + str(currentCost) + ") is cheaper than the known cost (" + str(cost) + ")")
 				name = hostName
 				mask = currentMask
 				cost = currentCost
 			else :
-				print("But it is not cheaper")
+				# print("But it is not cheaper")
+				pass
 
 		except AddressNotFoundException :
-			print("Host " + hostName + " does not contain the address " + str(ip))
+			# print("Host " + hostName + " does not contain the address " + str(ip))
+			pass
 
-	print(address + " " + name + " " + str(cost))
+	# print(address + " " + name + " " + str(cost))
 	return address + " " + name + " " + str(cost)
 
 # ------
@@ -101,7 +111,7 @@ def update (line) :
 	mask = IPv4Network(mask)
 	cost = int(cost)
 	hostList[host].update(mask, cost)
-	print(line)
+	# print(line)
 
 # --------
 # get port
@@ -129,6 +139,7 @@ def getRequest (socket) :
     """
 	request = socket.recv(MAX_FILE_SIZE)
 	request = bytes.decode(request)
+	print(request)
 	return request
 
 # -------------
@@ -153,8 +164,6 @@ def parseRequest (request) :
 	details["body"] = [lines[i] for i in range(1, size - 1)]
 	assert len(details["body"]) == size - 2
 	assert len(details["body"]) > 0
-
-	print (details)
 
 	return details
 
