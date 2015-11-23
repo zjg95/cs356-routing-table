@@ -18,8 +18,8 @@ from sys import argv, exit
 # server meta data
 # ----------------
 
-serverName = "Server"
-serverVersion = "0.1"
+serverName = "Routah"
+serverVersion = "1.0"
 MAX_FILE_SIZE = 8192
 endl = "\r\n"
 
@@ -84,19 +84,14 @@ def query (address) :
 		try :
 			currentMask, currentCost = hostList[hostName].query(ip)
 
-			# print("Host " + hostName + " contains the address " + str(ip))
-
 			if currentCost < cost or (currentCost == cost and currentMask.prefixlen > mask.prefixlen) :
-				# print("The cost (" + str(currentCost) + ") is cheaper than the known cost (" + str(cost) + ")")
 				name = hostName
 				mask = currentMask
 				cost = currentCost
 
 		except AddressNotFoundException :
-			# print("Host " + hostName + " does not contain the address " + str(ip))
 			pass
 
-	# print(address + " " + name + " " + str(cost))
 	return address + " " + name + " " + str(cost)
 
 # ------
@@ -108,7 +103,6 @@ def update (line) :
 	mask = IPv4Network(mask)
 	cost = int(cost)
 	hostList[host].update(mask, cost)
-	# print(line)
 
 # --------
 # get port
@@ -185,6 +179,7 @@ def getResponse (details) :
 		assert len(details["body"]) == 1
 		response += query(details["body"][0]) + endl
 	response += "END" + endl
+	print(response + "----------")
 	return response.encode()
 
 # ---------------
@@ -231,9 +226,9 @@ def listen() :
 # main
 # ----
 
-print("------------")
+print("----------")
 print(serverName + "/" + serverVersion)
-print("------------")
+print("----------")
 
 # define port number and socket
 port = getPort()
@@ -242,9 +237,8 @@ serverSocket = socket(AF_INET, SOCK_STREAM)
 # initialize host list
 for i in range(ord('A'), ord('I')) :
 	hostList[chr(i)] = Host(chr(i))
-# hostList[DEFAULT_HOST].update(DEFAULT_MASK, DEFAULT_COST)
 
 # activate socket
-serverSocket.bind(('localhost', port))
+serverSocket.bind(('', port))
 serverSocket.listen(1)
 listen()
