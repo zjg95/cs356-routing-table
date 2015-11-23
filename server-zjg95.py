@@ -54,13 +54,13 @@ class Host :
 		bestCost = DEFAULT_COST
 		for network in self.addresses :
 			if address in network :
-				# is this network better than the best?
+				# is this network cheaper than the cheapest?
 				cost = self.addresses[network]
 				if cost < bestCost :
 					bestNetwork = network
 					bestCost = cost
 		if bestNetwork != DEFAULT_MASK :
-			return bestNetwork, self.addresses[bestNetwork]
+			return bestNetwork, bestCost
 		raise AddressNotFoundException
 
 	def update(self, mask, cost) :
@@ -86,14 +86,11 @@ def query (address) :
 
 			# print("Host " + hostName + " contains the address " + str(ip))
 
-			if currentCost < cost :
+			if currentCost < cost or (currentCost == cost and currentMask.prefixlen > mask.prefixlen) :
 				# print("The cost (" + str(currentCost) + ") is cheaper than the known cost (" + str(cost) + ")")
 				name = hostName
 				mask = currentMask
 				cost = currentCost
-			else :
-				# print("But it is not cheaper")
-				pass
 
 		except AddressNotFoundException :
 			# print("Host " + hostName + " does not contain the address " + str(ip))
